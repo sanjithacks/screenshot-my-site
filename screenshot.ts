@@ -1,4 +1,6 @@
 import puppeteer from "puppeteer";
+import fs from "fs";
+import path from "path";
 
 async function takeScreenshot() {
   const browser = await puppeteer.launch({ headless: "new" });
@@ -17,8 +19,20 @@ async function takeScreenshot() {
 
   await page.goto(url.toString(), { waitUntil: "networkidle0" });
 
+  // Define the directory path
+  const directoryPath = path.join(__dirname, "screenshots");
+
+  // Check if the directory exists, if not, create it
+  if (!fs.existsSync(directoryPath)) {
+    fs.mkdirSync(directoryPath);
+    console.log("Screenshots directory created.");
+  }
+
   // Take a screenshot
-  const screenshotPath = `./screenshots/${url.hostname}_screenshot.png`;
+  const screenshotPath = path.join(
+    directoryPath,
+    `${url.hostname}_screenshot.png`
+  );
   await page.screenshot({ path: screenshotPath });
 
   console.log(`Screenshot saved at: ${screenshotPath}`);
